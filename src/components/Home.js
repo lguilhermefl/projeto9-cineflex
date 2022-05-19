@@ -1,19 +1,26 @@
 import { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
 import axios from 'axios';
 import styled from 'styled-components';
 
 import Status from "./Status"
+import API_URL from '../index';
 
-const API_URL = "https://mock-api.driven.com.br/api/v5/cineflex";
+
+function Poster({ posterURL, title  }) {
+    return (
+        <img src={posterURL} alt={title} />
+    );
+}
 
 export default function Home() {
 
     const [movies, setMovies] = useState([]);
 
     useEffect(() => {
-        const requisicao = axios.get(`${API_URL}/movies`);
+        const promise = axios.get(`${API_URL}/movies`);
 
-        requisicao.then(response => {
+        promise.then(response => {
             setMovies(response.data);
         });
     }, []);
@@ -24,7 +31,11 @@ export default function Home() {
                 <span>Selecione o filme</span>
             </Status>
             <MovieList>
-                {movies.map(item => <img key={item.id} src={item.posterURL} alt={item.title} />)}
+                {movies.map(item => 
+                    <Link key={item.id} to={`/sessoes/${item.id}`}>
+                        <Poster key={item.id} posterURL={item.posterURL}
+                            title={item.title} />
+                    </Link>)}
             </MovieList>
 
         </>

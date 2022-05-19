@@ -14,6 +14,7 @@ export default function App() {
                 <Top />
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/sessoes/:idMovie" element={<Movie />} />
                 </Routes>
             </BrowserRouter>
         </>
