@@ -1,21 +1,21 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Top from "./Top/Top"
-import Status from "./Status/Status"
-import Home from "./Home/Home"
+import Top from "./Top"
+import Home from "./Home"
 import Movie from "./Movie"
 import Session from "./Session"
 import OrderSuccess from "./OrderSuccess"
-import Footer from "./Footer/Footer";
+import Footer from "./Footer";
 
 export default function App() {
     return (
         <>
-            <Top />
-            <Status>
-                <span>Selecione o filme</span>
-            </Status>
-            <Home />
+            <BrowserRouter>
+                <Top />
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                </Routes>
+            </BrowserRouter>
         </>
     );
 }
