@@ -19,15 +19,15 @@ function Session({ day, date, showtimes }) {
     return (
         <Showtime>
             <Day>{day} - {date}</Day>
-            <Sessions>
+            <DaySessions>
                 {showtimes.map(showtime => <ShowTime key={showtime.id} time={showtime.name}
                     idSession={showtime.id} />)}
-            </Sessions>
+            </DaySessions>
         </Showtime>
     );
 }
 
-export default function Movie() {
+export default function Sessions() {
 
     const { idMovie } = useParams();
     const [sessions, setSessions] = useState();
@@ -106,7 +106,7 @@ const Day = styled.span`
     font-size: 20px;
 `
 
-const Sessions = styled.div`
+const DaySessions = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 8px;

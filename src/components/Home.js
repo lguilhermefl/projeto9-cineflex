@@ -7,7 +7,7 @@ import Status from "./Status"
 import API_URL from './Data/data';
 
 
-function Poster({ posterURL, title  }) {
+function Poster({ posterURL, title }) {
     return (
         <img src={posterURL} alt={title} />
     );

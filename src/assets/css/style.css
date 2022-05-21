@@ -10,7 +10,16 @@ a {
     text-decoration: none;
 }
 
+ion-icon {
+    color: #E8833A;
+    font-size: 40px;
+    position: absolute;
+    top: 14px;
+    left: 30px;
+}
+
 .root {
     position: relative;
     height: 100%;
 }
+

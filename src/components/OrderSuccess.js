@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import Status from "./Status";
 
-export default function OrderSuccess({ orderInfo }) {
+export default function OrderSuccess({ orderInfo, setOrderInfo }) {
     return (
         <>
             <Status>
@@ -26,7 +26,7 @@ export default function OrderSuccess({ orderInfo }) {
                 </InfoSection>
                 <Container>
                     <Link to="/">
-                        <button>Voltar pra Home</button>
+                        <button onClick={() => setOrderInfo()}>Voltar pra Home</button>
                     </Link>
                 </Container>
             </OrderDetails>

@@ -1,8 +1,17 @@
+import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
 export default function Header() {
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
     return (
         <TopBar>
+            {location.pathname !== "/" ? 
+                <ion-icon onClick={()=> navigate(-1)} name="caret-back-circle"></ion-icon> :
+                null
+            }
             <h1>CINEFLEX</h1>
         </TopBar>
     );
