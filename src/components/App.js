@@ -1,20 +1,27 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from 'react';
 
-import Top from "./Top"
+import Header from "./Header"
 import Home from "./Home"
 import Movie from "./Movie"
-import Session from "./Session"
+import Seats from "./Seats"
 import OrderSuccess from "./OrderSuccess"
-import Footer from "./Footer";
 
 export default function App() {
+
+    const [orderInfo, setOrderInfo] = useState();
+
     return (
         <>
             <BrowserRouter>
-                <Top />
+                <Header />
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/sessoes/:idMovie" element={<Movie />} />
+                    <Route path="/assentos/:idSession" element={
+                        <Seats setOrderInfo={setOrderInfo} />
+                    } />
+                    <Route path="/sucesso" element={<OrderSuccess orderInfo={orderInfo} />} />
                 </Routes>
             </BrowserRouter>
         </>

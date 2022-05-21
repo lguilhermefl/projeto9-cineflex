@@ -4,7 +4,7 @@ import axios from 'axios';
 import styled from 'styled-components';
 
 import Status from "./Status"
-import API_URL from '../index';
+import API_URL from './Data/data';
 
 
 function Poster({ posterURL, title  }) {
@@ -15,7 +15,7 @@ function Poster({ posterURL, title  }) {
 
 export default function Home() {
 
-    const [movies, setMovies] = useState([]);
+    const [movies, setMovies] = useState();
 
     useEffect(() => {
         const promise = axios.get(`${API_URL}/movies`);
@@ -31,7 +31,7 @@ export default function Home() {
                 <span>Selecione o filme</span>
             </Status>
             <MovieList>
-                {movies.map(item => 
+                { !movies ? "Carregando..." : movies.map(item => 
                     <Link key={item.id} to={`/sessoes/${item.id}`}>
                         <Poster key={item.id} posterURL={item.posterURL}
                             title={item.title} />
@@ -39,7 +39,6 @@ export default function Home() {
             </MovieList>
 
         </>
-
     );
 }
 
@@ -57,6 +56,7 @@ const MovieList = styled.div`
             padding: 8px;
             box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
             box-sizing: border-box;
+            cursor: pointer;
         }
 `
 

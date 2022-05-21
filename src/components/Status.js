@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export default function Status({ children }) {
     return (
         <StatusMessage>
-            { children }
+            {children}
         </StatusMessage>
     );
 }

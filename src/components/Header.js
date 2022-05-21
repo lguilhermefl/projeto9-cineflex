@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export default function Top() {
+export default function Header() {
     return (
         <TopBar>
             <h1>CINEFLEX</h1>
