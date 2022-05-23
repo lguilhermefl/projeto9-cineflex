@@ -66,6 +66,27 @@ export default function Seats({ setOrderInfo }) {
         });
     }, []);
 
+    const handleInputName = e => {
+        const regexName = new RegExp("[a-zA-Z]{1,50}");
+
+        if (!regexName.test(e.target.value)) {
+            e.target.setCustomValidity('Informe um nome válido! (somente letras)')
+        }
+    }
+
+    const handleInputCpf = e => {
+        const regexCpf = new RegExp("(([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}))");
+
+        if (!regexCpf.test(e.target.value)) {
+            e.target.setCustomValidity('Informe um CPF válido!');
+        }
+    }
+
+    const formatCPf = e => {
+        let cpf = e.target.value.replace(/[^\d]/g, "");
+        return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    }
+
     const sendOrder = e => {
 
         e.preventDefault();
@@ -128,13 +149,25 @@ export default function Seats({ setOrderInfo }) {
                 <BuyerInfo onSubmit={sendOrder}>
                     <label htmlFor="name">Nome do comprador:</label>
                     <input required type="text" placeholder="Digite seu nome..." id="name"
+                        pattern="[a-zA-Z]{1,50}"
+                        maxLength={50}
+                        onInvalid={handleInputName}
                         value={name}
-                        onChange={e => setName(e.target.value)}
+                        onChange={e => {
+                            try{e.target.setCustomValidity('')}catch(e){};
+                            setName(e.target.value)
+                        }}
                     />
                     <label htmlFor="cpf">CPF do comprador:</label>
-                    <input required type="number" placeholder="Digite seu CPF..." id="cpf"
+                    <input required type="text" placeholder="Digite seu CPF..." id="cpf"
+                        pattern="(([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}))"
+                        onInvalid={handleInputCpf}
+                        maxLength={14}
                         value={cpf}
-                        onChange={e => setCpf(e.target.value)}
+                        onChange={e => {
+                            try{e.target.setCustomValidity('')}catch(e){};
+                            setCpf(formatCPf(e))
+                        }}
                     />
                     <Container>
                         <button type="submit">Reservar assento(s)</button>
@@ -228,6 +261,7 @@ const Container = styled.div`
     display: flex;
     justify-content: center;
     width: 100%;
+    max-width: 500px;
     margin-top: 40px;
 
     button {
