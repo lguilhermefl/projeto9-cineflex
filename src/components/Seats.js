@@ -7,6 +7,68 @@ import Status from './Status';
 import Footer from './Footer';
 import API_URL from './Data/data';
 
+function BuyersInfo({ seatNumber, buyersInfo, setBuyersInfo, index }) {
+
+    const [name, setName] = useState("");
+    const [cpf, setCpf] = useState("");
+
+    const formatCPf = e => {
+        let cpf = e.target.value.replace(/[^\d]/g, "");
+        return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    }    
+
+    const handleInputName = e => {
+        const regexName = new RegExp("[a-zA-Z\s]{1,50}");
+
+        if (!regexName.test(e.target.value)) {
+            e.target.setCustomValidity('Informe um nome válido! (somente letras, max. 50)')
+        }
+    }
+
+    const handleInputCpf = e => {
+        const regexCpf = new RegExp("(([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}))");
+
+        if (!regexCpf.test(e.target.value)) {
+            e.target.setCustomValidity('Informe um CPF válido!');
+        }
+    }
+
+
+    return (
+        <>
+            <label htmlFor="name">Nome do comprador assento {seatNumber}:</label>
+            <input required type="text" placeholder="Digite seu nome..." id="name"
+                pattern="[a-zA-Z\s]{1,50}"
+                maxLength={50}
+                onInvalid={handleInputName}
+                value={name}
+                onChange={e => {
+                    try { e.target.setCustomValidity('') } catch (e) { };
+                    setName(e.target.value);
+                    let newBuyer = [...buyersInfo];
+                    newBuyer[index].idAssento = seatNumber;
+                    newBuyer[index].nome = e.target.value;
+                    setBuyersInfo(newBuyer);
+                }}
+            />
+            <label htmlFor="cpf">CPF do comprador:</label>
+            <input required type="text" placeholder="Digite seu CPF..." id="cpf"
+                onInvalid={handleInputCpf}
+                maxLength={14}
+                minLength={11}
+                value={cpf}
+                onChange={e => {
+                    try { e.target.setCustomValidity('') } catch (e) { };
+                    setCpf(formatCPf(e));
+                    let newBuyer = [...buyersInfo];
+                    newBuyer[index].cpf = e.target.value;
+                    setBuyersInfo(newBuyer);
+                }}
+            />
+        </>
+    );
+}
+
 function Seat({ number, isAvailable, chosenSeatsIds, setChosenSeatsIds, id,
     seatsNumbers, setSeatsNumbers }) {
 
@@ -54,6 +116,11 @@ export default function Seats({ setOrderInfo }) {
     const [seatsNumbers, setSeatsNumbers] = useState([]);
     const [name, setName] = useState("");
     const [cpf, setCpf] = useState("");
+    const [buyersInfo, setBuyersInfo] = useState([{
+        idAssento: "",
+        nome: "",
+        cpf: "",
+    }]);
 
     const { idSession } = useParams();
     const navigate = useNavigate();
@@ -66,30 +133,14 @@ export default function Seats({ setOrderInfo }) {
         });
     }, []);
 
-    const handleInputName = e => {
-        const regexName = new RegExp("[a-zA-Z]{1,50}");
-
-        if (!regexName.test(e.target.value)) {
-            e.target.setCustomValidity('Informe um nome válido! (somente letras)')
-        }
-    }
-
-    const handleInputCpf = e => {
-        const regexCpf = new RegExp("(([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}))");
-
-        if (!regexCpf.test(e.target.value)) {
-            e.target.setCustomValidity('Informe um CPF válido!');
-        }
-    }
-
-    const formatCPf = e => {
-        let cpf = e.target.value.replace(/[^\d]/g, "");
-        return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-    }
-
     const sendOrder = e => {
 
         e.preventDefault();
+
+        if (chosenSeatsIds.length === 0) {
+            alert("Selecione ao menos um assento!");
+            return;
+        }
 
         const body = {
             ids: chosenSeatsIds,
@@ -106,14 +157,13 @@ export default function Seats({ setOrderInfo }) {
             cpf
         });
 
-        if (chosenSeatsIds.length === 0) {
-            alert("Selecione ao menos um assento!");
-        } else {
-            axios
-                .post(`${API_URL}/seats/book-many`, body)
-                .then(() => navigate("/sucesso"));
-        }
+        axios
+            .post(`${API_URL}/seats/book-many`, body)
+            .then(() => navigate("/sucesso"));
     };
+
+    console.log(buyersInfo);
+    console.log(seatsNumbers);
 
     return (
         <>
@@ -147,9 +197,16 @@ export default function Seats({ setOrderInfo }) {
                     </Symbol>
                 </Caption>
                 <BuyerInfo onSubmit={sendOrder}>
+
+                    {seatsNumbers.length > 0 ? seatsNumbers.map((seatNumber, index) => <BuyersInfo 
+                        key={index} seatNumber={seatNumber} buyersInfo={buyersInfo}
+                        setBuyersInfo={setBuyersInfo} index={index}
+                        />) : null
+                    }
+                    {/*
                     <label htmlFor="name">Nome do comprador:</label>
                     <input required type="text" placeholder="Digite seu nome..." id="name"
-                        pattern="[a-zA-Z]{1,50}"
+                        pattern="[a-zA-Z\s]{1,50}"
                         maxLength={50}
                         onInvalid={handleInputName}
                         value={name}
@@ -160,15 +217,15 @@ export default function Seats({ setOrderInfo }) {
                     />
                     <label htmlFor="cpf">CPF do comprador:</label>
                     <input required type="text" placeholder="Digite seu CPF..." id="cpf"
-                        pattern="(([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}))"
                         onInvalid={handleInputCpf}
                         maxLength={14}
+                        minLength={11}
                         value={cpf}
                         onChange={e => {
                             try{e.target.setCustomValidity('')}catch(e){};
                             setCpf(formatCPf(e))
                         }}
-                    />
+                    /> */}
                     <Container>
                         <button type="submit">Reservar assento(s)</button>
                     </Container>
