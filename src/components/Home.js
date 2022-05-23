@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from 'axios';
 import styled from 'styled-components';
 
-import Status from "./Status"
+import Status from "./Shared/Status"
 import API_URL from './Data/data';
 
 

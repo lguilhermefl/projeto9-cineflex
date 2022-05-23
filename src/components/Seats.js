@@ -3,14 +3,11 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
-import Status from './Status';
-import Footer from './Footer';
+import Status from './Shared/Status';
+import Footer from './Shared/Footer';
 import API_URL from './Data/data';
 
 function BuyersInfo({ seatNumber, buyersInfo, setBuyersInfo, index }) {
-
-    const [name, setName] = useState("");
-    const [cpf, setCpf] = useState("");
 
     const formatCPf = e => {
         let cpf = e.target.value.replace(/[^\d]/g, "");
@@ -33,44 +30,44 @@ function BuyersInfo({ seatNumber, buyersInfo, setBuyersInfo, index }) {
         }
     }
 
+    const getName = e => {
+        try { e.target.setCustomValidity('') } catch (e) { };
+        let newBuyer = [...buyersInfo];
+        newBuyer[index].nome = e.target.value;
+        setBuyersInfo(newBuyer);
+    }
+
+    const getCpf = e => {
+        try { e.target.setCustomValidity('') } catch (e) { };
+        let newBuyer = [...buyersInfo];
+        newBuyer[index].cpf = formatCPf(e);
+        setBuyersInfo(newBuyer);
+    }
 
     return (
-        <>
-            <label htmlFor="name">Nome do comprador assento {seatNumber}:</label>
+        <InfoFields>
+            <label htmlFor="name">Nome do comprador assento <b>{seatNumber}</b>:</label>
             <input required type="text" placeholder="Digite seu nome..." id="name"
                 pattern="[a-zA-Z\s]{1,50}"
                 maxLength={50}
                 onInvalid={handleInputName}
-                value={name}
-                onChange={e => {
-                    try { e.target.setCustomValidity('') } catch (e) { };
-                    setName(e.target.value);
-                    let newBuyer = [...buyersInfo];
-                    newBuyer[index].idAssento = seatNumber;
-                    newBuyer[index].nome = e.target.value;
-                    setBuyersInfo(newBuyer);
-                }}
+                value={buyersInfo[index].nome}
+                onChange={getName}
             />
             <label htmlFor="cpf">CPF do comprador:</label>
             <input required type="text" placeholder="Digite seu CPF..." id="cpf"
+                pattern="(([0-9]{3}.[0-9]{3}.[0-9]{3}-[0-9]{2}))"
                 onInvalid={handleInputCpf}
                 maxLength={14}
-                minLength={11}
-                value={cpf}
-                onChange={e => {
-                    try { e.target.setCustomValidity('') } catch (e) { };
-                    setCpf(formatCPf(e));
-                    let newBuyer = [...buyersInfo];
-                    newBuyer[index].cpf = e.target.value;
-                    setBuyersInfo(newBuyer);
-                }}
+                value={buyersInfo[index].cpf}
+                onChange={getCpf}
             />
-        </>
+        </InfoFields>
     );
 }
 
 function Seat({ number, isAvailable, chosenSeatsIds, setChosenSeatsIds, id,
-    seatsNumbers, setSeatsNumbers }) {
+    seatsNumbers, setSeatsNumbers, buyersInfo, setBuyersInfo }) {
 
     const available = { bgColor: "#C3CFD9", borderColor: "#808F9D" };
     const unavailable = { bgColor: "#FBE192", borderColor: "#F7C52B" };
@@ -80,14 +77,19 @@ function Seat({ number, isAvailable, chosenSeatsIds, setChosenSeatsIds, id,
 
     const seatSelected = () => {
         setSeatState({ ...selected });
-        setChosenSeatsIds(chosenSeatsIds => [...chosenSeatsIds, id]);
-        setSeatsNumbers(seatsNumbers => [...seatsNumbers, number]);
+        setChosenSeatsIds([...chosenSeatsIds, id]);
+        setSeatsNumbers([...seatsNumbers, number]);
+        setBuyersInfo([...buyersInfo, {idAssento: number, nome: "", cpf: ""}]);
     };
 
     const seatAvailable = () => {
+        if(!window.confirm(`Deseja remover o assento ${number} e apagar os dados preenchidos?`)){
+            return;
+        }
         setSeatState({ ...available });
         setChosenSeatsIds(chosenSeatsIds.filter(seat => seat !== id));
         setSeatsNumbers(seatsNumbers.filter(seat => seat !== number));
+        setBuyersInfo(buyersInfo.filter(buyer => buyer.idAssento !== number));
     };
 
     const selectSeat = e => {
@@ -114,13 +116,7 @@ export default function Seats({ setOrderInfo }) {
     const [seats, setSeats] = useState();
     const [chosenSeatsIds, setChosenSeatsIds] = useState([]);
     const [seatsNumbers, setSeatsNumbers] = useState([]);
-    const [name, setName] = useState("");
-    const [cpf, setCpf] = useState("");
-    const [buyersInfo, setBuyersInfo] = useState([{
-        idAssento: "",
-        nome: "",
-        cpf: "",
-    }]);
+    const [buyersInfo, setBuyersInfo] = useState([]);
 
     const { idSession } = useParams();
     const navigate = useNavigate();
@@ -144,26 +140,20 @@ export default function Seats({ setOrderInfo }) {
 
         const body = {
             ids: chosenSeatsIds,
-            name: name,
-            cpf: cpf
+            compradores: buyersInfo
         }
 
         setOrderInfo({
             movie: seats.movie.title,
             day: seats.day.date,
             session: seats.name,
-            ids: [...seatsNumbers],
-            name,
-            cpf
+            buyers: buyersInfo
         });
 
         axios
             .post(`${API_URL}/seats/book-many`, body)
             .then(() => navigate("/sucesso"));
     };
-
-    console.log(buyersInfo);
-    console.log(seatsNumbers);
 
     return (
         <>
@@ -176,9 +166,10 @@ export default function Seats({ setOrderInfo }) {
                         seats.seats.map(
                             seat =>
                                 <Seat key={seat.id} number={seat.name} isAvailable={seat.isAvailable}
-                                    chosenSeatsIds={chosenSeatsIds} setChosenSeatsIds={setChosenSeatsIds}
-                                    id={seat.id} seatsNumbers={seatsNumbers}
-                                    setSeatsNumbers={setSeatsNumbers} />
+                                    chosenSeatsIds={chosenSeatsIds} id={seat.id}
+                                    setChosenSeatsIds={setChosenSeatsIds} seatsNumbers={seatsNumbers}
+                                    setSeatsNumbers={setSeatsNumbers} buyersInfo={buyersInfo}
+                                    setBuyersInfo={setBuyersInfo} />
                         )
                     }
                 </AllSeats>
@@ -197,35 +188,13 @@ export default function Seats({ setOrderInfo }) {
                     </Symbol>
                 </Caption>
                 <BuyerInfo onSubmit={sendOrder}>
-
-                    {seatsNumbers.length > 0 ? seatsNumbers.map((seatNumber, index) => <BuyersInfo 
-                        key={index} seatNumber={seatNumber} buyersInfo={buyersInfo}
-                        setBuyersInfo={setBuyersInfo} index={index}
-                        />) : null
+                    {seatsNumbers.length > 0 ? 
+                        seatsNumbers.map(
+                            (seatNumber, index) => 
+                                <BuyersInfo key={index} seatNumber={seatNumber} buyersInfo={buyersInfo}
+                                    setBuyersInfo={setBuyersInfo} index={index}/>) : 
+                        null
                     }
-                    {/*
-                    <label htmlFor="name">Nome do comprador:</label>
-                    <input required type="text" placeholder="Digite seu nome..." id="name"
-                        pattern="[a-zA-Z\s]{1,50}"
-                        maxLength={50}
-                        onInvalid={handleInputName}
-                        value={name}
-                        onChange={e => {
-                            try{e.target.setCustomValidity('')}catch(e){};
-                            setName(e.target.value)
-                        }}
-                    />
-                    <label htmlFor="cpf">CPF do comprador:</label>
-                    <input required type="text" placeholder="Digite seu CPF..." id="cpf"
-                        onInvalid={handleInputCpf}
-                        maxLength={14}
-                        minLength={11}
-                        value={cpf}
-                        onChange={e => {
-                            try{e.target.setCustomValidity('')}catch(e){};
-                            setCpf(formatCPf(e))
-                        }}
-                    /> */}
                     <Container>
                         <button type="submit">Reservar assento(s)</button>
                     </Container>
@@ -292,6 +261,11 @@ const BuyerInfo = styled.form`
     max-width: 500px;
     display: flex;
     flex-direction: column;
+`
+
+const InfoFields = styled.div`
+
+    margin-bottom: 20px;
 
     input {
         box-sizing: border-box;

@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
-import Status from './Status';
-import Footer from './Footer';
+import Status from './Shared/Status';
+import Footer from './Shared/Footer';
 import API_URL from './Data/data';
 
 function ShowTime({ idSession, time }) {
@@ -70,7 +70,8 @@ const SessionsList = styled.div`
     box-sizing: border-box;
     padding: 0 25px;
     width: 100%;
-    margin-bottom: 115px;
+    max-width: 500px;
+    margin: 0 auto 115px;
 `
 
 const MovieInfo = styled.div`

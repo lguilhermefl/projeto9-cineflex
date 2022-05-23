@@ -19,6 +19,10 @@ ion-icon {
     cursor: pointer;
 }
 
+b {
+    font-weight: 700;
+}
+
 button {
     cursor: pointer;
 }

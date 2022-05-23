@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import Status from "./Status";
+import Status from "./Shared/Status";
 
 export default function OrderSuccess({ orderInfo, setOrderInfo }) {
     return (
@@ -11,18 +11,20 @@ export default function OrderSuccess({ orderInfo, setOrderInfo }) {
             </Status>
             <OrderDetails>
                 <InfoSection>
-                    <span>Filme e sessão</span>
+                    <h3>Filme e sessão</h3>
                     <span>{orderInfo.movie}</span>
                     <span>{orderInfo.day} {orderInfo.session}</span>
                 </InfoSection>
                 <InfoSection>
-                    <span>Ingressos</span>
-                    {orderInfo.ids.map((seat, index) => <span key={index}>Assento {seat}</span>)}
+                    <h3>Ingresso(s)</h3>
+                    {orderInfo.buyers.map((buyer, index) => <span key={index}>Assento {buyer.idAssento}</span>)}
                 </InfoSection>
                 <InfoSection>
-                    <span>Comprador</span>
-                    <span>Nome: {orderInfo.name}</span>
-                    <span>CPF: {orderInfo.cpf}</span>
+                    <h3>Comprador(es)</h3>
+                    {orderInfo.buyers.map((buyer, index) => <BuyersInfo key={index}> 
+                        <span>Nome assento {buyer.idAssento}: {buyer.nome}</span>
+                        <span>CPF: {buyer.cpf}</span>
+                    </BuyersInfo>)}
                 </InfoSection>
                 <Container>
                     <Link to="/">
@@ -54,16 +56,28 @@ const InfoSection = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
+    max-width: 500px;
     margin-bottom: 40px;
+
+    h3 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
 
     span {
         margin-bottom: 5px;
     }
+`
 
-    span:nth-child(1) {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 10px;
+const BuyersInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+
+    span {
+        margin-bottom: 5px;
+        word-wrap: break-word;
     }
 `
 
