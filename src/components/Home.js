@@ -31,7 +31,7 @@ export default function Home() {
                 <span>Selecione o filme</span>
             </Status>
             <MovieList>
-                { !movies ? "Carregando..." : movies.map(item => 
+                { movies?.map(item => 
                     <Link key={item.id} to={`/sessoes/${item.id}`}>
                         <Poster key={item.id} posterURL={item.posterURL}
                             title={item.title} />

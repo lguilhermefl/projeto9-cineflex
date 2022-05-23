@@ -162,8 +162,7 @@ export default function Seats({ setOrderInfo }) {
             </Status>
             <SeatsInfo>
                 <AllSeats>
-                    {!seats ? "Carregando..." :
-                        seats.seats.map(
+                    {seats?.seats.map(
                             seat =>
                                 <Seat key={seat.id} number={seat.name} isAvailable={seat.isAvailable}
                                     chosenSeatsIds={chosenSeatsIds} id={seat.id}

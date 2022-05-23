@@ -33,11 +33,11 @@ export default function Sessions() {
     const [sessions, setSessions] = useState();
 
     useEffect(() => {
-        const promise = axios.get(`${API_URL}/movies/${idMovie}/showtimes`);
-
-        promise.then(response => {
-            setSessions(response.data);
-        });
+        axios
+            .get(`${API_URL}/movies/${idMovie}/showtimes`)
+            .then(response => {
+                setSessions(response.data);
+            });
     }, []);
 
     return (
@@ -46,8 +46,7 @@ export default function Sessions() {
                 <span>Selecione o horário</span>
             </Status>
             <SessionsList>
-                {!sessions ? "Carregando..." :
-                    sessions.days.map(session =>
+                { sessions?.days.map(session =>
                         <Session key={session.id} day={session.weekday}
                             date={session.date} showtimes={session.showtimes} />)
                 }
